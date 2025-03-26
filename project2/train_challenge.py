@@ -11,10 +11,18 @@ Train Challenge
 import torch
 import matplotlib.pyplot as plt
 
-from dataset import get_train_val_test_loaders
+from dataset_challenge import get_train_val_test_loaders
 from model.challenge import Challenge
 from train_common import evaluate_epoch, early_stopping, restore_checkpoint, save_checkpoint, train_epoch
 from utils import config, set_random_seed, make_training_plot
+
+
+def freeze_layers(model: torch.nn.Module, num_layers: int = 0) -> None:
+    for name, param in model.named_parameters():
+        if "conv" in name:
+            layer = int(name[4])
+            if layer <= num_layers:
+                param.requires_grad = False
 
 
 def main():
@@ -27,11 +35,18 @@ def main():
     )
     
     # Model
-    model = Challenge()
+    model = Challenge()    
+    model, _, _ = restore_checkpoint(
+        model,
+        config("source_challenge.checkpoint"),
+        force=True,
+        pretrain=True,
+    )
+    freeze_layers(model, 3)
 
     # TODO: define loss function, and optimizer
-    criterion = None
-    optimizer = None
+    criterion = torch.nn.CrossEntropyLoss()
+    optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
     
     # Attempts to restore the latest checkpoint if exists
     print("Loading challenge...")
@@ -56,7 +71,7 @@ def main():
     prev_val_loss = stats[0][1]
 
     # TODO: define patience for early stopping
-    patience = None
+    patience = 5
     curr_patience = 0
 
     # Loop over the entire dataset multiple times

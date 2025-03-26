@@ -29,7 +29,12 @@ def main():
 
     # TODO: Define the ViT Model according to the appendix D
 
+    model = ViT(num_patches = 16, num_blocks = 2, num_hidden = 16, num_heads = 2)
+
     # TODO: define loss function, and optimizer
+    
+    criterion = torch.nn.CrossEntropyLoss()
+    optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
     
     print(f"Number of float-valued parameters: {count_parameters(model)}")
 
@@ -58,8 +63,8 @@ def main():
     prev_val_loss = stats[0][1]
 
     # TODO: define patience for early stopping
-    patience = None
-    curr_patience = None
+    patience = 5
+    curr_patience = 0
 
     # Loop over the entire dataset multiple times
     epoch = start_epoch
