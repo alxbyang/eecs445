@@ -14,7 +14,10 @@ class RNN(nn.Module):
 
         super().__init__()
         # TODO: Define the parameters of the RNN 
-                            
+        self.hidden_size = hidden_size
+        self.lstm = nn.LSTMCell(input_size, hidden_size)
+        self.fc = nn.Linear(hidden_size, output_size)
+                       
         self.init_weights()
 
     def init_weights(self):
@@ -24,6 +27,15 @@ class RNN(nn.Module):
         """
 
         # TODO: Implement init_weights to initialize the weights of the LSTM and fully connected layer
+        for name, param in self.lstm.named_parameters():
+            if 'weight' in name:
+                nn.init.xavier_uniform_(param, gain=1.0)
+            elif 'bias' in name:
+                nn.init.constant_(param, 0.0)
+        
+        nn.init.xavier_uniform_(self.fc.weight, gain=1.0)
+        nn.init.constant_(self.fc.bias, 0.0)
+
 
     def forward(self, x):
         """
@@ -43,7 +55,13 @@ class RNN(nn.Module):
         h_t, c_t = self.init_hidden(x.size(0))
 
         # TODO: Loop through the sequence and apply LSTM to each time step
-        
+        for t in range(T):
+            x_t = x[:, t, :]
+            h_t, c_t = self.lstm(x_t, (h_t, c_t))
+
+        y = self.fc(h_t)
+        return torch.sigmoid(y)
+    
 
     def init_hidden(self, N):
         """
@@ -56,4 +74,8 @@ class RNN(nn.Module):
         A tuple of (hidden state, cell state), both initialized to zeros with shape (N, hidden_size).
         """
         # TODO: Return the initial hidden and cell states for LSTM
+        device = next(self.parameters()).device
+        h_0 = torch.zeros(N, self.hidden_size, device=device)
+        c_0 = torch.zeros(N, self.hidden_size, device=device)
+        return h_0, c_0
         

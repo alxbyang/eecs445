@@ -23,12 +23,18 @@ def visualize_kmeans(data: npt.NDArray, n_clusters: int, init: str) -> None:
     # - Set argument init ('random' or 'k-means++') to init
     # - Set random_state to 445
     # - Set n_init to 10
-    kmeans = None
+    kmeans = KMeans(
+        n_clusters=n_clusters,
+        init=init,
+        random_state=445,
+        n_init=10
+    )
 
     # Fit data to obtain clusters
     kmeans.fit(data)
 
     # TODO: Print final value of objective function ("inertia_") and include it in your writeup for 3.1c
+    print(f"Final inertia for {init} initialization: {kmeans.inertia_}")
     
     # Plot each cluster on the same axes
     plt.figure()
@@ -51,6 +57,7 @@ def plot_inertia() -> None:
         # Keep the random state at 443 for clearer results
         clf = KMeans(k, init=init, random_state=443).fit(data) 
         # TODO: Add the inertia for each fit classifier to the list of inertias
+        inertias.append(clf.inertia_)
 
     plt.figure()
     plt.plot(n_clusters, inertias, linestyle="-")
@@ -68,7 +75,14 @@ def predict_new_data(noisy_data: np.ndarray, n_clusters: int, init: str) -> None
     # TODO: Utilizing the same KMeans model (with the same parameters) from visualize_kmeans, 
     # generate cluster assignments for the heldout dataset. Then fit this model on noisy data
     # provided.
-    kmeans = None
+    kmeans = KMeans(
+        n_clusters=n_clusters,
+        init=init,
+        random_state=445,
+        n_init=10
+    )
+    
+    kmeans.fit(noisy_data)
 
     # Plot each predicted cluster
     plt.figure()
@@ -86,8 +100,8 @@ if __name__ == '__main__':
 
     # TODO: 3.1c Set the init method as needed for the problem
     # Note: init can be set to either "random" or "k-means++"
-    n_clusters = None
-    init = None
+    n_clusters = 8
+    init = "k-means++"
 
     
     print("Number of clusters:", n_clusters)
@@ -98,7 +112,7 @@ if __name__ == '__main__':
 
     # TODO: 3.1d Implement plot_inertia to generate a plot of KMeans losses with different
     # numbers of clusters. Uncomment the line below to run the code.
-    # plot_inertia()
+    plot_inertia()
 
     noisy_data = pd.read_csv("q3_data/noisy.csv").values
 
@@ -106,7 +120,7 @@ if __name__ == '__main__':
     # clusters for the datapoints in the noisy dataset. Input new_data_n_clusters according
     # the the problem.
 
-    new_data_n_clusters = None
-    # predict_new_data(noisy_data, new_data_n_clusters, init)
+    new_data_n_clusters = 5
+    predict_new_data(noisy_data, new_data_n_clusters, init)
 
 

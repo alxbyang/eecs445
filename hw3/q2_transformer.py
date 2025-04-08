@@ -34,6 +34,10 @@ class TinyTransformer:
         Q, K, V matrices
         """
         # TODO: Compute Q, K, V matrices using linear algebra operations
+        Q = np.matmul(X, self.W_Q)
+        K = np.matmul(X, self.W_K)
+        V = np.matmul(X, self.W_V)
+        
         return Q, K, V
 
 
@@ -50,7 +54,7 @@ class TinyTransformer:
         # The Score function is defined as the matrix product of Q and K, divided by the square root of d_k
         # NOTE: the batch_size is 1 in this toy example
         # TODO Compute the attention scores
-        scores = None
+        scores = np.matmul(Q, K.transpose(0, 2, 1)) / np.sqrt(self.d_k)
 
         # Print the attention scores for the word 'won' (index 1 in this example)
         print("--------------q2.a--------------")
@@ -70,7 +74,9 @@ class TinyTransformer:
         """
         # TODO: first subtract the maximum value in each row for numerical stability
         # then use the softmax function to compute the attention weights
-        weights = None
+        scores -= np.max(scores, axis=-1, keepdims=True)
+        exp_scores = np.exp(scores)
+        weights = exp_scores / np.sum(exp_scores, axis=-1, keepdims=True)
         print("--------------q2.b--------------")
         print("attention weights for the query word 'won': ", weights[0, 1, :])
         print("--------------------------------\n")
@@ -88,7 +94,7 @@ class TinyTransformer:
         Context vector, shape [batch_size, seq_len, d_v]
         """
         # TODO: Compute the final context vector
-        context = None
+        context = np.matmul(weights, V)
         print("--------------q2.b--------------")
         print("context vector for the word 'won': ", context[0, 1, :])
         print("--------------------------------\n")

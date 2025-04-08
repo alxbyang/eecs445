@@ -15,7 +15,11 @@ def hierarchical_clustering(data: np.ndarray):
     # TODO: 3.2a Define the AgglomerativeClustering class with n_clusters set to None
     # this will cause the model to generate a full linkage tree for our dendrogram. Set the
     # distance_threshold to 0.
-    model = None
+    model = AgglomerativeClustering(
+        n_clusters=None,
+        distance_threshold=0,
+        linkage="ward"
+    )
     model.fit(data)    
 
     return model  # Return the fit model
@@ -47,6 +51,7 @@ def plot_dendrogram(model: AgglomerativeClustering):
     # TODO: 3.2a Call the sklearn dendrogram function to plot the dendrogram
     # from the linkage matrix. Set truncate mode to "lastp" and set p to 5 
     # to only display the top 5 branches/clusters of the dendrogram
+    dendrogram(linkage_matrix, truncate_mode="lastp", p=5)
         
 
     plt.title("Hierarchical Clustering Dendrogram")
@@ -68,8 +73,11 @@ def hierarchical_predict_labels(data: np.ndarray, n_clusters: int):
     # Hint: look into the sklearn documentation on AgglomerativeClustering and see which
     # function can be used to generate labels for data.
 
-    model = None
-    labels = None
+    model = AgglomerativeClustering(
+        n_clusters=n_clusters,
+        linkage="ward"
+    )
+    labels = model.fit(data).labels_
 
     return model, labels
 
@@ -101,8 +109,8 @@ if __name__ == '__main__':
 
     # TODO: 3.2b Define the number of clusters to predict using hierarchical clustering.
     # and uncomment the lines below to generate a plot of the clusters.
-    n_clusters = None
+    n_clusters = 5
 
-    # print("Predicting clusters and plotting points...")
-    # _, labels = hierarchical_predict_labels(data, n_clusters)
-    # plot_clusters(data, labels, n_clusters)
+    print("Predicting clusters and plotting points...")
+    _, labels = hierarchical_predict_labels(data, n_clusters)
+    plot_clusters(data, labels, n_clusters)
