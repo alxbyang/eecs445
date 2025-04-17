@@ -24,10 +24,15 @@ class Autoencoder(nn.Module):
 
         # TODO: Implement the encoder and decoder as PyTorch modules 
         #       according to the specifications in problem set
-        self.encoder = None
-        self.decoder = None
-
-        raise NotImplementedError
+        self.in_dim = self.in_dim = in_shape[0] * in_shape[1] # this should be 784
+        self.encoder = nn.Sequential(
+            nn.Linear(self.in_dim, latent_dim),
+            nn.ReLU()
+        )
+        self.decoder = nn.Sequential(
+            nn.Linear(latent_dim, self.in_dim),
+            nn.Sigmoid()
+        )
 
         self.apply(self._init_weights)
 
@@ -53,7 +58,8 @@ class Autoencoder(nn.Module):
         - latent representation
         """
         # TODO: Implement the forward pass of the encoder
-        raise NotImplementedError
+        x = x.view(x.size(0), -1)
+        return self.encoder(x)
 
     
     def decode(self, x: torch.Tensor) -> torch.Tensor:
@@ -67,7 +73,8 @@ class Autoencoder(nn.Module):
         - reconstructed image
         """
         # TODO: Implement the forward pass of the decoder
-        raise NotImplementedError
+        x = self.decoder(x)
+        return x.view(x.size(0), *self.in_shape)
 
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
@@ -81,6 +88,4 @@ class Autoencoder(nn.Module):
         - reconstructed image
         """
         # TODO: Implement the forward pass of the autoencoder
-        raise NotImplementedError
-
-        return x
+        return self.decode(self.encode(x))

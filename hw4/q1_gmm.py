@@ -84,7 +84,13 @@ def gmm(trainX, num_K, num_iter=10, plot=False):
         k according to current values of si2, p and mu
         """
         # TODO: Implement the E-step by calculating the values of z
-        raise NotImplementedError
+        for n in range(N):
+            bottom = 0
+            for k in range(num_K):
+                bottom += p[k] * gaussian(trainX[n], mu[k], si2)
+            for k in range(num_K):
+                top = p[k] * gaussian(trainX[n], mu[k], si2)
+                z[n, k] = top / bottom
 
         """
         M-step
@@ -92,25 +98,37 @@ def gmm(trainX, num_K, num_iter=10, plot=False):
         """
 
         # TODO: Estimate new value of p
-        raise NotImplementedError
+        gamma_k = np.sum(z, axis=0)
+        p = (gamma_k / N).reshape(-1, 1)
 
         # TODO: Estimate new value for mu's
-        raise NotImplementedError
+        for k in range(num_K):
+            weighted_sum = np.dot(z[:, k], trainX)
+            mu[k] = weighted_sum / gamma_k[k]
 
         # TODO: Estimate new value for sigma^2
-        raise NotImplementedError
+        si2 = 0
+        for k in range(num_K):
+            diff = trainX - mu[k]
+            squared_norms = np.sum(diff ** 2, axis=1)
+            si2 += np.dot(z[:, k], squared_norms)
+        si2 /= (N * D)
 
     if plot:
         plt.ioff()
         plt.savefig('visualize_clusters.png')
 
     # TODO: Compute the expected log-likelihood of data for the optimal parameters computed
-    raise NotImplementedError
-    loglikelihood = 0.0
+    log_likely = 0.0
+    for n in range(N):
+        likley = 0
+        for k in range(num_K):
+            likley += p[k] * gaussian(trainX[n], mu[k], si2)
+        log_likely += np.log(likley)
 
     # TODO: Compute the BIC for the current clustering
-    raise NotImplementedError
-    BIC = None
+    m = (num_K * D) + (num_K - 1) + 1
+    BIC = m * np.log(N) - 2 * log_likely
 
     return mu, p, z, si2, float(BIC)
 

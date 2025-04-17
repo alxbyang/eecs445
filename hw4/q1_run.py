@@ -48,10 +48,20 @@ def main():
         bestBIC = float("inf")
         # TODO: Run gmm function 10 times and select the best model for the current value of k, 
         #       storing the BIC value for that model. Use the default num_iter=10 in calling gmm()
-        raise NotImplementedError
+        for run in range(10):
+            _, _, _, _, bic = gmm(trainX, k, num_iter=10)
+            if bic < bestBIC:
+                bestBIC = bic
+        BIC_K[idx] = bestBIC
 
     # TODO: Part d: Make a plot to show BIC as function of clusters K
-    raise NotImplementedError
+    plt.figure()
+    plt.plot(num_K, BIC_K, marker='o')
+    plt.title("BIC vs # of clusters")
+    plt.xlabel("# of clusters (K)")
+    plt.ylabel("BIC")
+    plt.grid(True)
+    plt.savefig('K_clusters_BIC.png')
 
 
 if __name__ == "__main__":

@@ -141,7 +141,10 @@ def add_noise(images: torch.Tensor, noise_level: float=0.2) -> torch.Tensor:
     # https://pytorch.org/docs/stable/generated/torch.randn_like.html
 
     # TODO: Add noise to the images
-    raise NotImplementedError
+    noise = noise_level * torch.randn_like(images)
+    images_modified = images + noise
+    images_modified = torch.clamp(images_modified, -1.0, 1.0)
+    return images_modified
 
 def test_autoencoder(
     autoencoder: nn.Module, 
